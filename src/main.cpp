@@ -64,7 +64,7 @@ L298N motor1(motorEnable, motorIN1, motorIN2);
 //misc variable declarations
 int changeTime = 0;
 int tempTemperature;
-int motorSpeed = 255;
+int motorSpeed = 100;
 
 
  
@@ -127,7 +127,7 @@ void maintainTemp(int setPoint){
 
 void runMotor(int setPoint){
   if (setPoint - checkTemp() <= temperatureSwing){ //if temperature is high enough, run motor
-    motor1.forward();
+    motor1.backward();
   }
   else{
     motor1.stop();
