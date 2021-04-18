@@ -6,7 +6,7 @@
 
 //library imports
 #include <Arduino.h>
-#include "Adafruit_MAX31855.h"
+#include <Adafruit_MAX31855.h>
 #include <L298N.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -33,30 +33,38 @@ const int numeral[10]= {
 
 //pins for decimal point and each segment
 //dp, G, F, E, D, C, B, A
-const int segmentPins[]= {7,3,6,11,9,5,0,8};
+/*
+Pinout of display
+
+D1  A  F  D2  D3  B
+8 . 8 . 8 . 8 .
+E  D  DP  C  G  D4
+
+*/
+const int segmentPins[]= {9,7,3,11,10,8,0,4};
 const int numberofDigits=4;
-const int digitPins[numberofDigits] = {10,4,2,1}; //digits 1, 2, 3, 4
+const int digitPins[numberofDigits] = {5,2,1,6}; //digits 1, 2, 3, 4
 
 //temperature control variables
 int temperatureSetPoint;
 int temperatureSwing = 2; //allowable swing in temperature
 
 //thermocouple reading pins
-const int thermocoupleDO = 39;
+const int thermocoupleDO = 37;
 const int thermocoupleCS = 38;
-const int thermocoupleCLK = 37;
+const int thermocoupleCLK = 39;
 Adafruit_MAX31855 thermocouple(thermocoupleCLK, thermocoupleCS, thermocoupleDO); //create thermocouple instance
 
 //motor controller pins
-const int motorIN1 = 30;
-const int motorIN2 = 31;
-const int motorEnable = 29;
-L298N motor(motorEnable, motorIN1, motorIN2);
+const unsigned int motorIN1 = 30;
+const unsigned int motorIN2 = 31;
+const unsigned int motorEnable = 29;
+L298N motor1(motorEnable, motorIN1, motorIN2);
 
 //misc variable declarations
 int changeTime = 0;
 int tempTemperature;
-int motorSpeed = 100;
+int motorSpeed = 255;
 
 
  
@@ -117,6 +125,14 @@ void maintainTemp(int setPoint){
 }
 
 
+void runMotor(int setPoint){
+  if (setPoint - checkTemp() <= temperatureSwing){ //if temperature is high enough, run motor
+    motor1.forward();
+  }
+  else{
+    motor1.stop();
+  }
+}
 
 void setup(){
   //set pinmode for all pins
@@ -131,7 +147,7 @@ void setup(){
   for (int i=0; i < numberofDigits; i++){
     pinMode(digitPins[i], OUTPUT);
   }
-  motor.setSpeed(motorSpeed);
+  motor1.setSpeed(motorSpeed);
   temperatureSetPoint = readPot();
 }
 
@@ -141,6 +157,7 @@ void setup(){
 void loop(){
   //check temperature, adjust heater if needed
   maintainTemp(temperatureSetPoint);
+  runMotor(temperatureSetPoint);
   
   //if value from potentiometer not equal to setpoint, run temperature change routine
   if (readPot() != temperatureSetPoint){
