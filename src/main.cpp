@@ -64,7 +64,7 @@ L298N motor1(motorEnable, motorIN1, motorIN2);
 //misc variable declarations
 int changeTime = 0;
 int tempTemperature;
-int motorSpeed = 100;
+int motorSpeed = 80;
 
 
  
@@ -118,7 +118,7 @@ void maintainTemp(int setPoint){
     digitalWrite(heaterPin, HIGH);
     digitalWrite(ledPin, HIGH);
   }
-  else if (setPoint - checkTemp() >= -temperatureSwing){ //if setpoint is lower than actual temperature by over n degrees, stop heater
+  else if (setPoint - checkTemp() <= temperatureSwing){ //if setpoint is lower than actual temperature by over n degrees, stop heater
     digitalWrite(heaterPin, LOW);
     digitalWrite(ledPin, LOW);
   }
@@ -126,7 +126,7 @@ void maintainTemp(int setPoint){
 
 
 void runMotor(int setPoint){
-  if (setPoint - checkTemp() <= temperatureSwing){ //if temperature is high enough, run motor
+  if (setPoint - checkTemp() <= temperatureSwing+3){ //if temperature is high enough, run motor
     motor1.backward();
   }
   else{
