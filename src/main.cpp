@@ -134,6 +134,8 @@ void runMotor(int setPoint){
   }
 }
 
+
+
 void setup(){
   //set pinmode for all pins
   pinMode(heaterPin, OUTPUT);
